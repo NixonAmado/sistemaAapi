@@ -10,14 +10,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="patient in patientList" :key="patient.PacienteId" v-on:click="editar(patient.PacienteId)" id="tr-patientList">
-                <th scope="row">{{ patient.PacienteId}}</th>
-                <td>{{ patient.Nombre }}</td>
-                <td>{{ patient.DNI }}</td>
-                <td>{{ patient.Telefono }}</td>
-                <td>{{ patient.Correo }}</td>
-
-
+              <tr v-for="patient in patientList" :key="patient.id" v-on:click="editar(patient.id)" id="tr-patientList">
+                <th scope="row">{{ patient.id}}</th>
+                <td>{{ patient.name }}</td>
+                <td>{{ patient.address }}</td>
+                <td>{{ patient.dni }}</td>
+                <td>{{ patient.email }}</td>
               </tr>
             </tbody>
           </table>
@@ -36,7 +34,7 @@ export default {
     name:"Dashboard",
     data(){
         return{
-            patientList:null,
+            patientList:[],
             page:1,
             patientKeys:""
         }
@@ -53,18 +51,23 @@ export default {
 
 
     mounted:function() {
-        let direccion = "https://api.solodata.es/pacientes?page=$1";
+        let direccion = "http://localhost:5077/API/patient";
+
         axios
         .get(direccion)
         .then( response => {
-            this.patientKeys = Object.keys(response.data[0]);
             this.patientList = response.data;
+            this.patientKeys = Object.keys(this.patientList[0]).slice(0,5);
+             //   .map(keys => keys.replace("_"," "));
+            console.log(this.patientKeys);
         
     })
         .catch(error =>
         console.error(error)
         );
+
     }
+
 }
 </script>
 

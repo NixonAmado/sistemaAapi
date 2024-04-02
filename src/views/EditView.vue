@@ -8,11 +8,11 @@ import Edit from '@/components/FooterComponent.vue';
             <form class="row">
                 <div class="mb-3 col-sm-6">
                   <label for="inputEditName" class="form-label"> Name </label>
-                  <input type="text" class="form-control" id="inputEditName" aria-describedby="editName" v-model="form.nombre">
+                  <input type="text" class="form-control" id="inputEditName" aria-describedby="editName" v-model="form.name">
                 </div>
                 <div class="mb-3 col-sm-3">
                     <label for="inputEditAddress" class="form-label"> Address </label>
-                    <input type="text" class="form-control" id="inputEditAddress" aria-describedby="editAddress" v-model="form.direccion">
+                    <input type="text" class="form-control" id="inputEditAddress" aria-describedby="editAddress" v-model="form.address">
                   </div>
                 <div class="mb-3  col-sm-3">
                   <label for="InputEditDNI" class="form-label">DNI</label>
@@ -20,23 +20,23 @@ import Edit from '@/components/FooterComponent.vue';
                 </div>
                 <div class="mb-3  col-sm-4">
                     <label for="InputEditPostalCode" class="form-label">PostalCode</label>
-                    <input type="number" class="form-control" id="InputEditPostalCode" v-model="form.codigoPostal">
+                    <input type="number" class="form-control" id="InputEditPostalCode" v-model="form.postalCode">
                 </div>
                 <div class="mb-3  col-sm-4">
                     <label for="InputEditTelefono" class="form-label">Phone Number</label>
-                    <input type="number" class="form-control" id="InputEditTelefono" v-model="form.telefono">
+                    <input type="number" class="form-control" id="InputEditTelefono" v-model="form.phone_number">
                 </div>
                 <div class="mb-3  col-sm-4">
                     <label for="InputEditGenero" class="form-label">Gender</label>
-                    <input type="text" class="form-control" id="InputEditGenero" v-model="form.genero">
+                    <input type="text" class="form-control" id="InputEditGenero" v-model="form.gender">
                 </div>  
                 <div class="mb-3  col-sm-6">
-                    <label for="InputEditFechaNacimiento" class="form-label">BirthDate</label>
-                    <input type="date" class="form-control" id="InputEditFechaNacimiento" v-model="form.fechaNacimiento">
+                    <label for="InputEditFechaNacimiento" class="form-label">Birth Date</label>
+                    <input type="date" class="form-control" id="InputEditFechaNacimiento" v-model="form.birth_date">
                 </div>              
                 <div class="mb-3  col-sm-6">
-                    <label for="InputEditCorreo" class="form-label">Correo</label>
-                    <input type="email" class="form-control" id="InputEditCorreo" v-model="form.Correo">
+                    <label for="InputEditCorreo" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="InputEditCorreo" v-model="form.email">
                 </div>                
                 <div class="form-group">
                     <button type="button" class="btn btn-outline-primary" v-on:click="Edit()" >Edit</button>
@@ -66,16 +66,7 @@ export default {
         return {
             patientId:null,
             form:{
-                "pacienteId":"",
-                "nombre" : "",
-                "direccion": "", 
-                "dni" : "",
-                "correo":"",
-                "codigoPostal" :"",
-                "genero" : "",
-                "telefono" : "",
-                "fechaNacimiento" : "",
-                "token" : "" 
+                "token":""
             }
         }
     },
@@ -87,12 +78,11 @@ export default {
           })
       },
         Delete(){
-            var enviar = {
-                "pacienteId" : this.form.pacienteId,
-                "token" : this.form.token
-            }
-            console.log(enviar)
-            axios.delete("https://api.solodata.es/pacientes/", { headers : enviar })
+            axios.delete(`http://localhost:5077/API/patient/${this.patientId}`, {
+                headers: {
+                    'Authorization': `Bearer ${this.form.token}`
+                }
+            })
             .then(data => {
                console.log(data); 
                 this.$router.push("/dashboard");
@@ -105,23 +95,13 @@ export default {
 
     mounted:function() {
         this.patientId = this.$route.params.id;
-        axios.get(`https://api.solodata.es/pacientes?id=${this.patientId}`) 
+        axios.get(`http://localhost:5077/API/patient/${this.patientId}`) 
         .then(response => {
-            // no fué posible hacer la inicialización con spreed ya que los nombres de las key que entran no son los mismos que salen(problemas de camelCase), y por ende el servidor lanza error
-            //this.form = {...response.data[0]};
-        this.form.nombre = response.data[0].Nombre;
-        this.form.direccion = response.data[0].Direccion;
-        this.form.dni = response.data[0].DNI;
-        this.form.correo = response.data[0].Correo;
-        this.form.codigoPostal = response.data[0].CodigoPostal;
-        this.form.genero = response.data[0].Genero;
-        this.form.telefono = response.data[0].Telefono;
-        this.form.fechaNacimiento = response.data[0].FechaNacimiento;
-        this.form.token = localStorage.getItem("token");
-        console.log(this.form);
+            this.form = {...response.data};
+            this.form.token = localStorage.getItem("token");
+            console.log("form",this.form);
+            console.log("token",this.form.token);
 
-            this.form.token = localStorage.getItem("token") || "";
-            console.log("form nombre: " + this.form.nombre)
         })
     }
 }
